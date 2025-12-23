@@ -1,0 +1,29 @@
+from collections import defaultdict
+
+states = [(i, j) for i in range(3) for j in range(3)]
+actions = [(-1,0),(1,0),(0,-1),(0,1)]  # U, D, L, R
+goal, item, obstacle = (2,2), (1,1), (0,1)
+
+gamma = 0.9
+V = defaultdict(float)
+policy_prob = 0.25
+
+def reward(s):
+    if s == item: return 2
+    if s == goal: return 5
+    if s == obstacle: return -2
+    return -0.1
+
+for _ in range(50):  # policy evaluation iterations
+    for s in states:
+        if s == goal: continue
+        V[s] = sum(
+            policy_prob * (
+                reward((s[0]+a[0], s[1]+a[1])) +
+                gamma * V[(s[0]+a[0], s[1]+a[1])]
+            )
+            for a in actions
+            if 0 <= s[0]+a[0] < 3 and 0 <= s[1]+a[1] < 3
+        )
+
+print(dict(V))
